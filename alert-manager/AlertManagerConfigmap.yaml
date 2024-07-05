@@ -1,0 +1,89 @@
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: alertmanager-config
+#   namespace: monitoring
+# data:
+#   config.yml: |-
+#     global:
+#       resolve_timeout: 5m
+#     route:
+#       receiver: 'slack-webhook'
+#       group_wait: 30s
+#       group_interval: 5m
+#       repeat_interval: 12h
+#       routes:
+#         - receiver: 'slack-webhook'
+#           match:
+#             severity: slack
+#     receivers:
+#       - name: 'slack-webhook'
+#         slack_configs:
+#           - channel: '#general'
+#             send_resolved: true
+#             username: 'alertmanager-bot'
+#             icon_emoji: ':robot_face:'
+#             api_url: 'https://hooks.slack.com/services/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'
+
+
+
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: alertmanager-config
+#   namespace: monitoring
+# data:
+#   config.yml: |-
+#     global:
+#       templates:
+#       - '/etc/alertmanager/*.tmpl'
+
+#     route:
+#       group_by: ['alertname', 'priority']
+#       group_wait: 10s
+#       repeat_interval: 1m
+#       routes:
+#         - receiver: slack-webhook
+#           match:
+#             severity: slack
+#           group_wait: 10s
+#           repeat_interval: 1m
+
+#     receivers:
+#       - name: 'slack-webhook'
+#         slack_configs:
+#           - api_url: "https://hooks.slack.com/services/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"
+#             channel: "#general"
+
+
+
+
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: alertmanager-config
+  namespace: monitoring
+data:
+  config.yml: |-
+    global:
+    templates:
+    - '/etc/alertmanager/*.tmpl'
+    route:
+      receiver: slack
+      group_by: ['alertname', 'priority']
+      group_wait: 10s
+      repeat_interval: 1m
+      routes:
+        - receiver: slack
+        # Send severity=slack alerts to slack.
+          match:
+            severity: slack
+          group_wait: 10s
+          repeat_interval: 1m
+
+    receivers:
+    - name: 'slack'
+      slack_configs:
+      - api_url: https://hooks.slack.com/services/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
+        channel: '#general'
